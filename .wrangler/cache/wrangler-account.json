@@ -1,0 +1,12 @@
+{
+  "account": {
+    "id": "54ec2bf42a22658b70d4067333667f7b",
+    "name": "Farhanagogo9@gmail.com's Account"
+  }, "d1_databases": [
+    {
+      "binding": "portfolio_db",
+      "database_name": "portfolio-db",
+      "database_id": "59aa2ac1-fe00-4110-8869-15c7c37a746f"
+    }
+  ]
+}  

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Manage Projects</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0c0c0f;
+  --surface:  #13131a;
+  --card-s:   #1c1c26;
+  --border:   rgba(255,255,255,0.07);
+  --border-h: rgba(240,152,60,0.3);
+  --accent:   #f0983c;
+  --accent2:  #ffd49a;
+  --accent-d: #c06e1a;
+  --red:      #e05252;
+  --red-bg:   rgba(224,82,82,0.08);
+  --red-bdr:  rgba(224,82,82,0.25);
+  --green:    #4cce6b;
+  --text:     #ede8e0;
+  --muted:    #97918b;
+  --mono:     'DM Mono', monospace;
+  --sans:     'Syne', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(240,152,60,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240,152,60,0.025) 1px, transparent 1px);
+  background-size: 52px 52px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LOGIN SCREEN ── */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+#login-screen.hidden { display: none; }
+.login-box {
+  background: var(--card-s);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.login-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+.login-sub {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+}
+.login-error {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--red);
+  text-align: center;
+  min-height: 1rem;
+}
+
+/* ── SHARED INPUT STYLES ── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label {
+  font-family: var(--mono);
+  font-size: 0.67rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.field-input, .field-textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  padding: 0.65rem 0.9rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+.field-input:focus, .field-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(240,152,60,0.08);
+}
+.field-textarea { resize: vertical; min-height: 70px; }
+.field-hint {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-accent {
+  background: var(--accent);
+  color: #0c0c0f;
+}
+.btn-accent:hover { box-shadow: 0 6px 20px rgba(240,152,60,0.3); }
+.btn-danger {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red-bdr);
+  font-size: 0.72rem;
+  padding: 0.4rem 0.8rem;
+}
+.btn-danger:hover { background: rgba(224,82,82,0.15); box-shadow: 0 4px 12px rgba(224,82,82,0.15); }
+.btn-ghost-sm {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-size: 0.72rem;
+  padding: 0.4rem 0.8rem;
+}
+.btn-ghost-sm:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── LAYOUT ── */
+#admin-app { display: none; position: relative; z-index: 1; }
+#admin-app.active { display: block; }
+.admin-header {
+  border-bottom: 1px solid var(--border);
+  padding: 1.2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(12,12,15,0.8);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.admin-logo {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+.admin-logo span { color: var(--muted); }
+.admin-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem 6rem;
+}
+.admin-title {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+}
+.admin-sub {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+}
+
+/* ── ADD FORM ── */
+.form-card {
+  background: var(--card-s);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.8rem;
+  margin-bottom: 3rem;
+}
+.form-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-card-title::before {
+  content: '+';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(240,152,60,0.12);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 100px;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.form-row-full { margin-bottom: 1rem; }
+.form-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+/* ── PROJECT LIST ── */
+.list-header {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.list-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.list-count {
+  background: rgba(240,152,60,0.1);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+}
+
+.proj-item {
+  background: var(--card-s);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 0.7rem;
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.proj-item:hover {
+  border-color: var(--border-h);
+  transform: translateX(3px);
+}
+.proj-item-num {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+.proj-item-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+.proj-item-desc {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.proj-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.mini-tag {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  padding: 2px 7px;
+  background: rgba(240,152,60,0.08);
+  color: var(--accent);
+  border: 1px solid rgba(240,152,60,0.18);
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.proj-item-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ── LOADING / EMPTY ── */
+.loading-msg, .empty-msg {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+/* ── TOAST NOTIFICATION ── */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--card-s);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--text);
+  z-index: 999;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(76,206,107,0.3); }
+.toast.success::before { content: '✓'; color: var(--green); font-weight: 700; }
+.toast.error { border-color: var(--red-bdr); }
+.toast.error::before { content: '✕'; color: var(--red); font-weight: 700; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .admin-header { padding: 1rem 1.2rem; }
+  .admin-inner { padding: 2rem 1.2rem 4rem; }
+  .form-row { grid-template-columns: 1fr 1fr; }
+  .proj-item { grid-template-columns: 1fr; gap: 0.5rem; }
+  .proj-item-actions { justify-content: flex-end; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ LOGIN SCREEN ═══════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">🔒 Admin Access</div>
+    <div class="login-sub">Enter the admin password to manage projects</div>
+    <div class="field">
+      <label class="field-label">Password</label>
+      <input class="field-input" type="password" id="login-pass" placeholder="••••••••" autofocus>
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <button class="btn btn-accent" id="login-btn" onclick="doLogin()">Unlock</button>
+  </div>
+</div>
+
+<!-- ═══════ ADMIN APP ═══════ -->
+<div id="admin-app">
+  <header class="admin-header">
+    <div class="admin-logo">farhan_admin <span>/ projects</span></div>
+    <div style="display:flex; gap:0.8rem; align-items:center;">
+      <a href="/" class="btn btn-ghost-sm">← Back to site</a>
+      <button class="btn btn-ghost-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </header>
+
+  <main class="admin-inner">
+    <h1 class="admin-title">Manage Projects</h1>
+    <p class="admin-sub">Add, remove, and reorder your portfolio projects. Changes go live instantly.</p>
+
+    <!-- ── ADD NEW PROJECT ── -->
+    <div class="form-card">
+      <div class="form-card-title">Add New Project</div>
+      <div class="form-row">
+        <div class="field">
+          <label class="field-label">Number</label>
+          <input class="field-input" type="text" id="f-num" placeholder="007">
+        </div>
+        <div class="field">
+          <label class="field-label">Title</label>
+          <input class="field-input" type="text" id="f-title" placeholder="My Awesome Project">
+        </div>
+        <div class="field">
+          <label class="field-label">Order</label>
+          <input class="field-input" type="number" id="f-order" placeholder="1" value="0">
+        </div>
+      </div>
+      <div class="form-row-full">
+        <div class="field">
+          <label class="field-label">Description</label>
+          <textarea class="field-textarea" id="f-desc" placeholder="Brief description of the project..."></textarea>
+        </div>
+      </div>
+      <div class="form-row-full">
+        <div class="field">
+          <label class="field-label">Tags</label>
+          <input class="field-input" type="text" id="f-tags" placeholder="PHP, Vue.js, MySQL">
+          <span class="field-hint">Comma-separated (e.g. React, Node.js, PostgreSQL)</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-accent" id="add-btn" onclick="addProject()">Add Project</button>
+      </div>
+    </div>
+
+    <!-- ── PROJECT LIST ── -->
+    <div class="list-header">
+      Existing Projects <span class="list-count" id="proj-count">0</span>
+    </div>
+    <div id="projects-list">
+      <div class="loading-msg">Loading projects...</div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════ TOAST ═══════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/api';
+let token = '';
+
+// ── LOGIN ──
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const pass = document.getElementById('login-pass').value.trim();
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  if (!pass) { errEl.textContent = 'Please enter a password'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+  errEl.textContent = '';
+
+  try {
+    const res = await fetch(`${API}/admin-auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pass }),
+    });
+
+    if (res.ok) {
+      token = pass;
+      sessionStorage.setItem('admin_token', pass);
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('admin-app').classList.add('active');
+      loadProjects();
+    } else {
+      errEl.textContent = 'Wrong password. Try again.';
+    }
+  } catch (err) {
+    errEl.textContent = 'Connection error. Is the site deployed?';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Unlock';
+}
+
+function doLogout() {
+  sessionStorage.removeItem('admin_token');
+  token = '';
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('admin-app').classList.remove('active');
+  document.getElementById('login-pass').value = '';
+}
+
+// Auto-login if session exists
+(function checkSession() {
+  const saved = sessionStorage.getItem('admin_token');
+  if (saved) {
+    token = saved;
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('admin-app').classList.add('active');
+    loadProjects();
+  }
+})();
+
+// ── LOAD PROJECTS ──
+async function loadProjects() {
+  const container = document.getElementById('projects-list');
+  container.innerHTML = '<div class="loading-msg">Loading projects...</div>';
+
+  try {
+    const res = await fetch(`${API}/projects`);
+    const projects = await res.json();
+
+    document.getElementById('proj-count').textContent = projects.length;
+
+    if (projects.length === 0) {
+      container.innerHTML = '<div class="empty-msg">No projects yet. Add one above!</div>';
+      return;
+    }
+
+    container.innerHTML = projects.map(p => `
+      <div class="proj-item">
+        <div class="proj-item-num">${esc(p.num)}</div>
+        <div>
+          <div class="proj-item-title">${esc(p.title)}</div>
+          <div class="proj-item-desc">${esc(p.description)}</div>
+          <div class="proj-item-tags">
+            ${p.tags.map(t => `<span class="mini-tag">${esc(t)}</span>`).join('')}
+          </div>
+        </div>
+        <div class="proj-item-actions">
+          <button class="btn btn-danger" onclick="deleteProject(${p.id}, '${esc(p.title)}')">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = `<div class="empty-msg" style="color:var(--red);">Error loading projects: ${err.message}</div>`;
+  }
+}
+
+// ── ADD PROJECT ──
+async function addProject() {
+  const num   = document.getElementById('f-num').value.trim();
+  const title = document.getElementById('f-title').value.trim();
+  const desc  = document.getElementById('f-desc').value.trim();
+  const tags  = document.getElementById('f-tags').value.trim();
+  const order = parseInt(document.getElementById('f-order').value) || 0;
+  const btn   = document.getElementById('add-btn');
+
+  if (!num || !title || !desc || !tags) {
+    toast('Fill in all fields', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Adding…';
+
+  try {
+    const res = await fetch(`${API}/projects`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        num,
+        title,
+        description: desc,
+        tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+        sort_order: order,
+      }),
+    });
+
+    if (res.ok) {
+      toast('Project added!', 'success');
+      // Clear form
+      document.getElementById('f-num').value = '';
+      document.getElementById('f-title').value = '';
+      document.getElementById('f-desc').value = '';
+      document.getElementById('f-tags').value = '';
+      document.getElementById('f-order').value = '0';
+      loadProjects();
+    } else {
+      const data = await res.json();
+      toast(data.error || 'Failed to add', 'error');
+    }
+  } catch (err) {
+    toast('Connection error', 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Add Project';
+}
+
+// ── DELETE PROJECT ──
+async function deleteProject(id, title) {
+  if (!confirm(`Delete "${title}"? This can't be undone.`)) return;
+
+  try {
+    const res = await fetch(`${API}/projects-delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id }),
+    });
+
+    if (res.ok) {
+      toast('Project deleted', 'success');
+      loadProjects();
+    } else {
+      toast('Failed to delete', 'error');
+    }
+  } catch (err) {
+    toast('Connection error', 'error');
+  }
+}
+
+// ── TOAST ──
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── HTML ESCAPE ──
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

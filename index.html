@@ -138,7 +138,7 @@ section { position: relative; z-index: 1; }
   gap: 10px;
 }
 
-/* ── AVAILABLE DOT — matches experience section style ── */
+/* ── AVAILABLE DOT ── */
 .ping-dot {
   position: relative;
   display: inline-block;
@@ -409,7 +409,6 @@ section { position: relative; z-index: 1; }
   color: var(--muted);
 }
 
-/* Shared pulse animation used by both available dot and experience dots */
 @keyframes dot-pulse {
   0%   { transform: scale(1);   opacity: 0.6; }
   100% { transform: scale(2.4); opacity: 0; }
@@ -551,6 +550,16 @@ section { position: relative; z-index: 1; }
   transform: translateY(-2px);
 }
 
+/* ── PROJECTS LOADING STATE ── */
+.projects-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--muted);
+  padding: 3rem 0;
+}
+
 /* ── EXPERIENCE ── */
 #experience { border-top: 1px solid var(--border); }
 .timeline {
@@ -560,7 +569,6 @@ section { position: relative; z-index: 1; }
 }
 .tline-item {
   display: grid;
-  /* date | dot-column | content */
   grid-template-columns: 180px 28px 1fr;
   gap: 0 1.2rem;
   padding: 2rem 0;
@@ -578,7 +586,6 @@ section { position: relative; z-index: 1; }
   letter-spacing: 0.05em;
 }
 
-/* ── EXPERIENCE DOT — column 2, aligned to title ── */
 .tline-dot {
   position: relative;
   width: 8px;
@@ -588,7 +595,7 @@ section { position: relative; z-index: 1; }
   border: 2px solid var(--bg);
   box-shadow: 0 0 0 1px var(--accent-d);
   justify-self: center;
-  margin-top: 5px; /* visually align with title baseline */
+  margin-top: 5px;
   flex-shrink: 0;
 }
 .tline-dot::after {
@@ -779,11 +786,10 @@ footer {
     </p>
     <h1 class="hero-name" style="font-size: 100px;">
       FARHAN
-      <span style="font-size: 50px;"><em>DESIGNER &amp; DEVELOPER</em></span>
+      <span style="font-size: 30px;"><em>Developer &amp; Designer</em></span>
     </h1>
     <p class="hero-sub" style="color: #ede8e0;">I build thoughtful digital experiences — from pixel-perfect interfaces to robust backend systems. Clean code, intentional design.</p>
     <div class="hero-cta">
-      <!-- View Work: eye icon -->
       <a href="#projects" class="btn-primary">
         <span class="btn-eye">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -793,7 +799,6 @@ footer {
         </span>
         View Work
       </a>
-      <!-- Get in Touch: arrow icon -->
       <a href="#contact" class="btn-ghost">
         Get in Touch
         <span class="btn-arrow">
@@ -884,90 +889,13 @@ footer {
   </div>
 </section>
 
-<!-- PROJECTS -->
+<!-- PROJECTS (now loads dynamically from D1 database) -->
 <section id="projects">
   <div class="section-inner">
     <p class="section-label reveal">03 &nbsp; Projects</p>
     <h2 class="section-title reveal">Selected work</h2>
-    <div class="projects-grid">
-      <div class="proj-card reveal">
-        <div class="proj-header">
-          <span class="proj-num">001</span>
-          <span class="proj-arrow">&#8599;</span>
-        </div>
-        <div class="proj-title">Finance Tracker App</div>
-        <div class="proj-desc">A personal budget calculator tracking daily spending, salary, and balance projections with a sleek dark UI.</div>
-        <div class="proj-tags">
-          <span class="tag">PHP</span>
-          <span class="tag">HTML/CSS</span>
-          <span class="tag">Finance</span>
-        </div>
-      </div>
-      <div class="proj-card reveal">
-        <div class="proj-header">
-          <span class="proj-num">002</span>
-          <span class="proj-arrow">&#8599;</span>
-        </div>
-        <div class="proj-title">E-Commerce Platform</div>
-        <div class="proj-desc">Full-stack marketplace with real-time inventory, payment integration, and an admin analytics dashboard.</div>
-        <div class="proj-tags">
-          <span class="tag">Laravel</span>
-          <span class="tag">Vue.js</span>
-          <span class="tag">MySQL</span>
-        </div>
-      </div>
-      <div class="proj-card reveal">
-        <div class="proj-header">
-          <span class="proj-num">003</span>
-          <span class="proj-arrow">&#8599;</span>
-        </div>
-        <div class="proj-title">Design System Kit</div>
-        <div class="proj-desc">A reusable component library built in React with Storybook documentation and accessibility baked in.</div>
-        <div class="proj-tags">
-          <span class="tag">React</span>
-          <span class="tag">Storybook</span>
-          <span class="tag">TypeScript</span>
-        </div>
-      </div>
-      <div class="proj-card reveal">
-        <div class="proj-header">
-          <span class="proj-num">004</span>
-          <span class="proj-arrow">&#8599;</span>
-        </div>
-        <div class="proj-title">Mobile POS System</div>
-        <div class="proj-desc">Point-of-sale app for small businesses with offline support, receipt printing, and cloud sync.</div>
-        <div class="proj-tags">
-          <span class="tag">React Native</span>
-          <span class="tag">Node.js</span>
-          <span class="tag">SQLite</span>
-        </div>
-      </div>
-      <div class="proj-card reveal">
-        <div class="proj-header">
-          <span class="proj-num">005</span>
-          <span class="proj-arrow">&#8599;</span>
-        </div>
-        <div class="proj-title">AI Content Dashboard</div>
-        <div class="proj-desc">Admin panel integrating LLM APIs for content generation, scheduling, and performance analytics.</div>
-        <div class="proj-tags">
-          <span class="tag">Next.js</span>
-          <span class="tag">OpenAI API</span>
-          <span class="tag">Prisma</span>
-        </div>
-      </div>
-      <div class="proj-card reveal">
-        <div class="proj-header">
-          <span class="proj-num">006</span>
-          <span class="proj-arrow">&#8599;</span>
-        </div>
-        <div class="proj-title">Open Source CLI Tool</div>
-        <div class="proj-desc">A command-line scaffolding tool for rapid project setup with customizable templates and presets.</div>
-        <div class="proj-tags">
-          <span class="tag">Node.js</span>
-          <span class="tag">CLI</span>
-          <span class="tag">NPM</span>
-        </div>
-      </div>
+    <div class="projects-grid" id="projects-grid">
+      <div class="projects-loading">Loading projects...</div>
     </div>
   </div>
 </section>
@@ -1068,6 +996,66 @@ footer {
 </footer>
 
 <script>
+// ══════════════════════════════════════════
+// DYNAMIC PROJECTS — Loads from D1 via API
+// Falls back to hardcoded if API fails
+// ══════════════════════════════════════════
+
+const FALLBACK_PROJECTS = [
+  { num: '001', title: 'Finance Tracker App', description: 'A personal budget calculator tracking daily spending, salary, and balance projections with a sleek dark UI.', tags: ['PHP','HTML/CSS','Finance'] },
+  { num: '002', title: 'E-Commerce Platform', description: 'Full-stack marketplace with real-time inventory, payment integration, and an admin analytics dashboard.', tags: ['Laravel','Vue.js','MySQL'] },
+  { num: '003', title: 'Design System Kit', description: 'A reusable component library built in React with Storybook documentation and accessibility baked in.', tags: ['React','Storybook','TypeScript'] },
+  { num: '004', title: 'Mobile POS System', description: 'Point-of-sale app for small businesses with offline support, receipt printing, and cloud sync.', tags: ['React Native','Node.js','SQLite'] },
+  { num: '005', title: 'AI Content Dashboard', description: 'Admin panel integrating LLM APIs for content generation, scheduling, and performance analytics.', tags: ['Next.js','OpenAI API','Prisma'] },
+  { num: '006', title: 'Open Source CLI Tool', description: 'A command-line scaffolding tool for rapid project setup with customizable templates and presets.', tags: ['Node.js','CLI','NPM'] },
+];
+
+function escHTML(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function renderProjects(projects) {
+  const grid = document.getElementById('projects-grid');
+  grid.innerHTML = projects.map(p => `
+    <div class="proj-card reveal">
+      <div class="proj-header">
+        <span class="proj-num">${escHTML(p.num)}</span>
+        <span class="proj-arrow">&#8599;</span>
+      </div>
+      <div class="proj-title">${escHTML(p.title)}</div>
+      <div class="proj-desc">${escHTML(p.description)}</div>
+      <div class="proj-tags">
+        ${p.tags.map(t => `<span class="tag">${escHTML(t)}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Re-attach reveal observer to new cards
+  grid.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+  // Re-attach magnetic tilt
+  initCardTilt();
+}
+
+async function loadProjects() {
+  try {
+    const res = await fetch('/api/projects');
+    if (!res.ok) throw new Error('API error');
+    const projects = await res.json();
+    // If DB is empty, use fallback
+    if (projects.length === 0) {
+      renderProjects(FALLBACK_PROJECTS);
+    } else {
+      renderProjects(projects);
+    }
+  } catch (err) {
+    // API not available yet (local dev, or D1 not set up) — use fallback
+    console.log('Using fallback projects (API unavailable):', err.message);
+    renderProjects(FALLBACK_PROJECTS);
+  }
+}
+
 // ── SCROLL REVEAL (staggered) ──
 const reveals = document.querySelectorAll('.reveal');
 const revealObs = new IntersectionObserver((entries) => {
@@ -1124,17 +1112,19 @@ document.querySelectorAll('.btn-primary').forEach(btn => {
 });
 
 // ── PROJECT CARD MAGNETIC TILT ──
-document.querySelectorAll('.proj-card').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width  - 0.5;
-    const y = (e.clientY - r.top)  / r.height - 0.5;
-    card.style.transform = `translateY(-6px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg)`;
+function initCardTilt() {
+  document.querySelectorAll('.proj-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `translateY(-6px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
-});
+}
 
 // ── NAV ACTIVE UNDERLINE ──
 const sections = document.querySelectorAll('section[id]');
@@ -1179,6 +1169,9 @@ if (footerBack) {
     footerBack.style.transform = '';
   });
 }
+
+// ── LOAD PROJECTS ON PAGE LOAD ──
+loadProjects();
 </script>
 </body>
 </html>
