@@ -22,6 +22,49 @@
   --mono:     'DM Mono', monospace;
   --sans:     'Syne', sans-serif;
 }
+html.light {
+  --bg:       #f5f2ee;
+  --surface:  #eceae6;
+  --card:     #eceae600;
+  --card-s:   #e2dfd9;
+  --border:   rgba(0,0,0,0.08);
+  --border-h: rgba(192,110,26,0.3);
+  --accent:   #c06e1a;
+  --accent2:  #a05010;
+  --accent-d: #7a3c00;
+  --cyan:     #1a7a9a;
+  --text:     #1a1714;
+  --muted:    #6b6460;
+}
+html.light body::before {
+  background-image:
+    linear-gradient(rgba(192,110,26,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(192,110,26,0.04) 1px, transparent 1px);
+}
+html.light body::after {
+  background: radial-gradient(ellipse, rgba(192,110,26,0.07) 0%, transparent 65%);
+}
+html.light nav {
+  background: rgba(245,242,238,0.85);
+}
+
+/* ── THEME TOGGLE ── */
+#theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+#theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -775,6 +818,7 @@ footer {
     <li><a href="#experience">Experience</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <button id="theme-toggle" title="Toggle theme">🌙</button>
 </nav>
 
 <!-- HERO -->
@@ -1169,6 +1213,16 @@ if (footerBack) {
     footerBack.style.transform = '';
   });
 }
+
+// ── THEME TOGGLE ──
+const themeBtn = document.getElementById('theme-toggle');
+const isLight = localStorage.getItem('theme') === 'light';
+if (isLight) { document.documentElement.classList.add('light'); themeBtn.textContent = '☀️'; }
+themeBtn.addEventListener('click', () => {
+  const light = document.documentElement.classList.toggle('light');
+  themeBtn.textContent = light ? '☀️' : '🌙';
+  localStorage.setItem('theme', light ? 'light' : 'dark');
+});
 
 // ── LOAD PROJECTS ON PAGE LOAD ──
 loadProjects();
